@@ -3,6 +3,9 @@ import getFavoriteListings from '../actions/getFavoriteListings';
 import EmptyState from '../components/EmptyState';
 import FavoritesClient from './FavoritesClient';
 
+export const dynamic = 'force-dynamic';
+
+
 const FavoritesPage = async () => {
   const listings = await getFavoriteListings();
   const currentUser = await getCurrentUser();
