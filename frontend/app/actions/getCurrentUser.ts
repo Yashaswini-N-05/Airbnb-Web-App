@@ -2,7 +2,7 @@ import axios from 'axios';
 import { SafeUser } from '../types';
 import { CURRENT_USER } from '@/app/config/currentUser';
 
-const BACKEND_URL = 'http://localhost:8000';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
 
 const getCurrentUser = async (): Promise<SafeUser | null> => {
   try {
