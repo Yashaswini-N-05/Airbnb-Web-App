@@ -54,7 +54,7 @@ class BookingViewSet(ModelViewSet):
     def get_queryset(self):
         qs = Booking.objects.select_related("user", "listing").prefetch_related(
             "guest_details"
-        )
+        ).exclude(status=Booking.STATUS_CANCELLED)
         if not self.request.user.is_authenticated:
             return qs.none()
             
