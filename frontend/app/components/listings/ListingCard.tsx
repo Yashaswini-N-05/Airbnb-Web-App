@@ -85,7 +85,13 @@ const ListingCard: React.FC<Props> = ({
             fill
             className="object-cover h-full w-full group-hover:scale-110 transition"
           />
-          <div className="absolute top-3 right-3">
+          {parseFloat(rating) >= 4.8 && (
+            <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-neutral-800 text-xs font-semibold px-2.5 py-1 rounded-md shadow-sm flex items-center gap-1 border border-neutral-200 z-10">
+              <span className="text-amber-500 font-bold">★</span>
+              <span>Superhost</span>
+            </div>
+          )}
+          <div className="absolute top-3 right-3 z-10">
             <HeartButton listingId={data.id} currentUser={currentUser || null} />
           </div>
         </div>

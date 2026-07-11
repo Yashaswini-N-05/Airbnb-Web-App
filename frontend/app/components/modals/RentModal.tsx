@@ -178,9 +178,21 @@ const RentModal = () => {
 
   if (step === STEPS.IMAGES) {
     bodyContent = (
-      <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-6">
         <Heading title="Add a photo of your place" subtitle="Show guests what your place looks like!" />
         <ImageUpload value={imageSrc} onChange={(value) => setCustomValue('imageSrc', value)} />
+        <div className="flex items-center gap-2 my-1">
+          <div className="h-[1px] bg-neutral-200 w-full" />
+          <span className="text-neutral-400 text-xs uppercase font-semibold">OR</span>
+          <div className="h-[1px] bg-neutral-200 w-full" />
+        </div>
+        <Input
+          id="imageSrc"
+          label="Paste an Image URL instead"
+          disabled={isLoading}
+          register={register}
+          errors={errors}
+        />
       </div>
     );
   }

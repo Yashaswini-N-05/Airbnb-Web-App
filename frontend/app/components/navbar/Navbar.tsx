@@ -13,8 +13,8 @@ interface Props {
 
 const Navbar: React.FC<Props> = ({ currentUser }) => {
   return (
-    <div className="fixed w-full bg-white z-10 shadow-sm">
-      <div className="py-4 border-b-[1px]">
+    <div className="fixed w-full bg-white dark:bg-neutral-900 z-10 shadow-sm transition-colors duration-200">
+      <div className="py-4 border-b-[1px] dark:border-neutral-800">
         <Container>
           <div className="flex flex-row items-center justify-between gap-3 md:gap-0">
             <Logo />

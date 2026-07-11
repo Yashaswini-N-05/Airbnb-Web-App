@@ -55,6 +55,8 @@ const Search = () => {
       onClick={searchModal.onOpen}
       className="
         border-[1px] 
+        dark:border-neutral-700
+        dark:bg-neutral-800
         w-full 
         md:w-auto 
         py-2 
@@ -78,6 +80,8 @@ const Search = () => {
             text-sm 
             font-semibold 
             px-6
+            text-neutral-800
+            dark:text-neutral-200
           "
         >
           {locationLabel}
@@ -90,8 +94,11 @@ const Search = () => {
             font-semibold 
             px-6 
             border-x-[1px] 
+            dark:border-x-neutral-700
             flex-1 
             text-center
+            text-neutral-800
+            dark:text-neutral-200
           "
         >
           {durationLabel}
@@ -102,6 +109,7 @@ const Search = () => {
             pl-6 
             pr-2 
             text-gray-600 
+            dark:text-neutral-400
             flex 
             flex-row 
             items-center 
