@@ -5,7 +5,7 @@ const BACKEND_URL = 'http://localhost:8000';
 export default async function getFavoriteListings() {
   try {
     const headers = { 'X-User-Id': '7bb66c05-0953-45ea-a835-41e39a9c61f8' };
-    const response = await axios.get(`${BACKEND_URL}/api/favorites/`, { headers });
+    const response = await axios.get(`${BACKEND_URL}/api/users/favorites/`, { headers });
     
     let favorites = [];
     if (response.data && response.data.success && response.data.data) {

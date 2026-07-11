@@ -10,7 +10,7 @@ const getCurrentUser = async (): Promise<SafeUser | null> => {
 
     let favoriteIds: string[] = [];
     try {
-      const favResponse = await axios.get(`${BACKEND_URL}/api/favorites/`, { headers });
+      const favResponse = await axios.get(`${BACKEND_URL}/api/users/favorites/`, { headers });
       if (favResponse.data && favResponse.data.success && favResponse.data.data) {
         favoriteIds = favResponse.data.data.map((fav: any) => fav.listing.id);
       }
