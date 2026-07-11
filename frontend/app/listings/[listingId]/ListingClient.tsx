@@ -128,6 +128,31 @@ const ListingClient: React.FC<Props> = ({ reservations = [], listing, currentUse
               />
             </div>
           </div>
+          {listing.reviews && listing.reviews.length > 0 && (
+            <div className="mt-8">
+              <hr className="mb-8 border-neutral-200" />
+              <h2 className="text-2xl font-semibold mb-6">Reviews</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {listing.reviews.map((review: any) => (
+                  <div key={review.id} className="flex flex-col gap-2">
+                    <div className="flex flex-row items-center gap-4">
+                      <div className="font-semibold">{review.user?.first_name || 'Guest'}</div>
+                      <div className="text-neutral-500 font-light text-sm">
+                        {new Date(review.created_at).toLocaleDateString()}
+                      </div>
+                    </div>
+                    <div className="flex flex-row items-center gap-1 font-light text-sm">
+                      <span>★</span>
+                      <span>{review.rating.toFixed(1)}</span>
+                    </div>
+                    <div className="text-neutral-600">
+                      {review.comment}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </Container>

@@ -35,6 +35,7 @@ export default async function getListingById(params: IParams) {
       guestCount: l.maxGuests || 1,
       locationValue: l.country || 'US',
       price: Math.round(parseFloat(l.pricePerNight || '100')),
+      reviews: l.reviews || [],
       userId: l.host?.id || 'host-id-placeholder',
       user: {
         id: l.host?.id || 'host-id-placeholder',

@@ -17,6 +17,7 @@ interface Props {
   actionLabel?: string;
   actionId?: string;
   currentUser?: SafeUser | null;
+  onEdit?: (listing: SafeListing) => void;
 }
 
 const ListingCard: React.FC<Props> = ({
@@ -27,6 +28,7 @@ const ListingCard: React.FC<Props> = ({
   actionLabel,
   actionId = '',
   currentUser,
+  onEdit,
 }) => {
   const router = useRouter();
   const { getByValue } = useCountries();
@@ -63,6 +65,16 @@ const ListingCard: React.FC<Props> = ({
     return `${format(start, 'PP')} - ${format(end, 'PP')}`;
   }, [reservation]);
 
+  const rating = useMemo(() => {
+    // Generate a pseudo-random but deterministic rating between 4.0 and 5.0 based on listing ID
+    let hash = 0;
+    for (let i = 0; i < data.id.length; i++) {
+      hash = data.id.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const val = Math.abs(hash) % 11; // 0 to 10
+    return (4.0 + (val / 10)).toFixed(1);
+  }, [data.id]);
+
   return (
     <div onClick={() => router.push(`/listings/${data.id}`)} className="col-span-1 cursor-pointer group">
       <div className="flex flex-col gap-2 w-full">
@@ -78,8 +90,14 @@ const ListingCard: React.FC<Props> = ({
           </div>
         </div>
 
-        <div className="font-semibold text-lg">
-          {location?.region} {location?.label}
+        <div className="flex flex-row items-center justify-between gap-1">
+          <div className="font-semibold text-lg">
+            {location?.region} {location?.label}
+          </div>
+          <div className="flex flex-row items-center gap-1 font-light">
+            <span>★</span>
+            <span>{rating}</span>
+          </div>
         </div>
         <div className="font-light text-neutral-500">{reservationDate || data.category}</div>
         <div className="flex flex-row items-center gap-1">
@@ -87,7 +105,23 @@ const ListingCard: React.FC<Props> = ({
           {!reservation && <div className="font-light">night</div>}
         </div>
 
-        {onAction && actionLabel && <Button disabled={disabled} small label={actionLabel} onClick={handleCancel} />}
+        {onAction && actionLabel && (
+          <div className="flex flex-row gap-2 mt-2 w-full">
+            {onEdit && (
+              <Button
+                disabled={disabled}
+                small
+                outline
+                label="Edit"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(data);
+                }}
+              />
+            )}
+            <Button disabled={disabled} small label={actionLabel} onClick={handleCancel} />
+          </div>
+        )}
       </div>
     </div>
   );

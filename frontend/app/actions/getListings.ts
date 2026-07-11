@@ -11,6 +11,7 @@ export interface IListingsParams {
   endDate?: string;
   locationValue?: string;
   category?: string;
+  page?: number;
 }
 
 export default async function getListings(params: IListingsParams) {
@@ -29,6 +30,9 @@ export default async function getListings(params: IListingsParams) {
     }
     if (locationValue) {
       queryParams.search = locationValue;
+    }
+    if (params.page) {
+      queryParams.page = params.page;
     }
 
     const response = await axios.get(`${BACKEND_URL}/api/listings/`, {

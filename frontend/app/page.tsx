@@ -3,6 +3,7 @@ import getListings, { IListingsParams } from './actions/getListings';
 import Container from './components/Container';
 import EmptyState from './components/EmptyState';
 import ListingCard from './components/listings/ListingCard';
+import LoadMore from './components/LoadMore';
 import { SafeListing } from './types';
 export const dynamic = 'force-dynamic';
 
@@ -27,6 +28,7 @@ const Home = async ({ searchParams }: HomeProps) => {
           return <ListingCard currentUser={currentUser} key={listing.id} data={listing} />;
         })}
       </div>
+      <LoadMore hasNextPage={listings.length >= 20} />
     </Container>
   );
 };

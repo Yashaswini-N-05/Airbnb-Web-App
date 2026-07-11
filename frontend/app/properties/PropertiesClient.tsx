@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import Container from '../components/Container';
 import Heading from '../components/Heading';
 import ListingCard from '../components/listings/ListingCard';
+import useEditListingModal from '../hooks/useEditListingModal';
 import { SafeListing, SafeUser } from '../types';
 
 interface Props {
@@ -16,6 +17,7 @@ interface Props {
 
 const PropertiesClient: React.FC<Props> = ({ listings, currentUser }) => {
   const router = useRouter();
+  const editModal = useEditListingModal();
   const [deletingId, setDeletingId] = useState('');
 
   const onCancel = useCallback(
@@ -48,6 +50,7 @@ const PropertiesClient: React.FC<Props> = ({ listings, currentUser }) => {
             data={listing}
             actionId={listing.id}
             onAction={onCancel}
+            onEdit={(listing) => editModal.onOpen(listing)}
             disabled={deletingId === listing.id}
             actionLabel="Delete property"
             currentUser={currentUser}
