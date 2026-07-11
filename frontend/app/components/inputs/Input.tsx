@@ -17,7 +17,7 @@ interface Props {
 const Input: React.FC<Props> = ({ id, label, type, disabled, formatPrice, required, register, errors }) => {
   return (
     <div className="w-full relative">
-      {formatPrice && <BiDollar size={24} className=" text-neutral-700 absolute top-5 left-2" />}
+      {formatPrice && <span className="text-neutral-500 absolute top-5 left-3 text-lg font-semibold select-none">₹</span>}
       <input
         id={id}
         disabled={disabled}

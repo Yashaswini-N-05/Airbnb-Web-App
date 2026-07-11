@@ -47,7 +47,7 @@ const RentModal = () => {
       roomCount: 1,
       bathroomCount: 1,
       imageSrc: '',
-      price: 1,
+      price: 2500,
       title: '',
       description: '',
     },

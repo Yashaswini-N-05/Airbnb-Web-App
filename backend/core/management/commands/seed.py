@@ -45,7 +45,7 @@ class Command(BaseCommand):
                     "address": f"{i} Example St",
                     "city": "Sample City",
                     "country": "Sample Country",
-                    "price_per_night": random.randint(50, 350),
+                    "price_per_night": random.randint(2500, 9000),
                     "max_guests": random.randint(1, 6),
                     "bedrooms": random.randint(1, 4),
                     "bathrooms": random.randint(1, 3),

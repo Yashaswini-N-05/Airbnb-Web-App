@@ -9,7 +9,7 @@ import useLoginModal from '@/app/hooks/useLoginModal';
 import Button from '@/app/components/Button';
 import { SafeListing, SafeReservation, SafeUser } from '@/app/types';
 import axios from 'axios';
-import { differenceInCalendarDays, eachDayOfInterval } from 'date-fns';
+import { differenceInCalendarDays, eachDayOfInterval, format } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Range } from 'react-date-range';
@@ -73,6 +73,19 @@ const ListingClient: React.FC<Props> = ({ reservations = [], listing, currentUse
       { label: 'Value', score: getVal(6) },
     ];
   }, [listing.id]);
+
+  const averageRating = useMemo(() => {
+    if (!listing.reviews || listing.reviews.length === 0) {
+      let hash = 0;
+      for (let i = 0; i < listing.id.length; i++) {
+        hash = listing.id.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      const val = Math.abs(hash) % 11;
+      return (4.0 + (val / 10)).toFixed(1);
+    }
+    const sum = listing.reviews.reduce((acc: number, item: any) => acc + parseFloat(item.rating || 0), 0);
+    return (sum / listing.reviews.length).toFixed(1);
+  }, [listing.reviews, listing.id]);
 
   const onCreateReservation = useCallback(() => {
     if (!currentUser) {
@@ -154,7 +167,17 @@ const ListingClient: React.FC<Props> = ({ reservations = [], listing, currentUse
           <div className="mt-8">
             <hr className="mb-8 border-neutral-200" />
             <div className="flex flex-row items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold">Reviews</h2>
+              <div className="flex items-center gap-3">
+                <h2 className="text-2xl font-semibold">Reviews</h2>
+                <div className="flex items-center gap-1.5 text-sm font-semibold text-neutral-800 dark:text-neutral-200 bg-neutral-100 dark:bg-neutral-800 px-2.5 py-1 rounded-md">
+                  <span>★</span>
+                  <span>{averageRating}</span>
+                  <span className="text-neutral-400 dark:text-neutral-500 font-light">•</span>
+                  <span>
+                    {listing.reviews?.length || 0} {listing.reviews?.length === 1 ? 'review' : 'reviews'}
+                  </span>
+                </div>
+              </div>
               <div className="w-[150px]">
                 <Button outline small label="Write a review" onClick={() => reviewModal.onOpen(listing.id)} />
               </div>
@@ -181,23 +204,27 @@ const ListingClient: React.FC<Props> = ({ reservations = [], listing, currentUse
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {listing.reviews.map((review: any) => (
-                    <div key={review.id} className="flex flex-col gap-2">
-                      <div className="flex flex-row items-center gap-4">
-                        <div className="font-semibold">{review.user?.first_name || 'Guest'}</div>
-                        <div className="text-neutral-500 font-light text-sm">
-                          {new Date(review.created_at).toLocaleDateString()}
+                  {listing.reviews.map((review: any) => {
+                    const reviewDate = review.createdAt || review.reviewDate || review.created_at || review.review_date;
+                    const formattedDate = reviewDate ? format(new Date(reviewDate), 'M/d/yyyy') : 'Recent';
+                    return (
+                      <div key={review.id} className="flex flex-col gap-2">
+                        <div className="flex flex-row items-center gap-4">
+                          <div className="font-semibold">{review.user?.first_name || review.reviewerName || 'Guest'}</div>
+                          <div className="text-neutral-500 font-light text-sm">
+                            {formattedDate}
+                          </div>
+                        </div>
+                        <div className="flex flex-row items-center gap-1 font-light text-sm">
+                          <span>★</span>
+                          <span>{parseFloat(review.rating || 0).toFixed(1)}</span>
+                        </div>
+                        <div className="text-neutral-600">
+                          {review.content || review.comment}
                         </div>
                       </div>
-                      <div className="flex flex-row items-center gap-1 font-light text-sm">
-                        <span>★</span>
-                        <span>{review.rating.toFixed(1)}</span>
-                      </div>
-                      <div className="text-neutral-600">
-                        {review.comment}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </>
             ) : (
