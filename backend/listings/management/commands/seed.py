@@ -76,74 +76,68 @@ class Command(BaseCommand):
         from users.models import UserProfile
         self.stdout.write("Starting database seeding...")
 
+        # Delete existing data in reverse dependency order to prevent foreign key errors
+        self.stdout.write("Cleaning up existing data...")
+        GuestDetail.objects.all().delete()
+        Booking.objects.all().delete()
+        Review.objects.all().delete()
+        Image.objects.all().delete()
+        Listing.objects.all().delete()
+        UserProfile.objects.all().delete()
+        User.objects.all().delete()
+
         # Fixed UUIDs matching frontend config/currentUser.ts and page hardcodes
         MAIN_HOST_ID   = uuid.UUID("b210662e-633f-4666-bfb6-9d827ab696fb")
         MAIN_GUEST_ID  = uuid.UUID("7bb66c05-0953-45ea-a835-41e39a9c61f8")
 
         # 1. Create primary Host (fixed UUID so frontend hardcodes always match)
-        main_host, created = User.objects.get_or_create(
+        main_host = User.objects.create(
+            id=MAIN_HOST_ID,
             email="host1@example.com",
-            defaults={
-                "id": MAIN_HOST_ID,
-                "username": "host_1",
-                "first_name": "Jane",
-                "last_name": "Smith",
-                "role": User.HOST,
-                "is_verified_host": True,
-                "host_approval_status": "approved",
-                "email_verified": True,
-            }
+            username="host_1",
+            first_name="Jane",
+            last_name="Smith",
+            role=User.HOST,
+            is_verified_host=True,
+            host_approval_status="approved",
+            email_verified=True,
         )
-        if created:
-            main_host.set_password("password123")
-            main_host.save()
-            UserProfile.objects.get_or_create(main_host, defaults={"bio": "Superhost with 5 years experience!"})
-        # Ensure the UUID is always correct even if user existed with different id
-        if str(main_host.id) != str(MAIN_HOST_ID):
-            User.objects.filter(pk=main_host.pk).update(id=MAIN_HOST_ID)
-            main_host.refresh_from_db()
+        main_host.set_password("password123")
+        main_host.save()
+        UserProfile.objects.create(user=main_host, bio="Superhost with 5 years experience!")
 
         # 2. Create primary Guest (fixed UUID so AutoUserAuthentication always finds them)
-        main_guest, created = User.objects.get_or_create(
+        main_guest = User.objects.create(
+            id=MAIN_GUEST_ID,
             email="guest1@example.com",
-            defaults={
-                "id": MAIN_GUEST_ID,
-                "username": "guest_1",
-                "first_name": "Alex",
-                "last_name": "Johnson",
-                "role": User.GUEST,
-                "email_verified": True,
-            }
+            username="guest_1",
+            first_name="Alex",
+            last_name="Johnson",
+            role=User.GUEST,
+            email_verified=True,
         )
-        if created:
-            main_guest.set_password("password123")
-            main_guest.save()
-            UserProfile.objects.get_or_create(main_guest, defaults={"bio": "Love travelling!"})
-        if str(main_guest.id) != str(MAIN_GUEST_ID):
-            User.objects.filter(pk=main_guest.pk).update(id=MAIN_GUEST_ID)
-            main_guest.refresh_from_db()
+        main_guest.set_password("password123")
+        main_guest.save()
+        UserProfile.objects.create(user=main_guest, bio="Love travelling!")
 
         # 3. Create 4 more Host Users
         hosts = [main_host]
         for i in range(2, 6):
             email = f"host{i}@example.com"
             username = f"host_{i}"
-            user, created = User.objects.get_or_create(
+            user = User.objects.create(
                 email=email,
-                defaults={
-                    "username": username,
-                    "first_name": f"HostFirst{i}",
-                    "last_name": f"HostLast{i}",
-                    "role": User.HOST,
-                    "is_verified_host": True,
-                    "host_approval_status": "approved",
-                    "email_verified": True,
-                }
+                username=username,
+                first_name=f"HostFirst{i}",
+                last_name=f"HostLast{i}",
+                role=User.HOST,
+                is_verified_host=True,
+                host_approval_status="approved",
+                email_verified=True,
             )
-            if created:
-                user.set_password("password123")
-                user.save()
-                UserProfile.objects.get_or_create(user=user, defaults={"bio": f"Hi, I am Host {i}!"})
+            user.set_password("password123")
+            user.save()
+            UserProfile.objects.create(user=user, bio=f"Hi, I am Host {i}!")
             hosts.append(user)
 
         self.stdout.write(f"Seeded {len(hosts)} Host Users.")
@@ -153,29 +147,20 @@ class Command(BaseCommand):
         for i in range(2, 6):
             email = f"guest{i}@example.com"
             username = f"guest_{i}"
-            user, created = User.objects.get_or_create(
+            user = User.objects.create(
                 email=email,
-                defaults={
-                    "username": username,
-                    "first_name": f"GuestFirst{i}",
-                    "last_name": f"GuestLast{i}",
-                    "role": User.GUEST,
-                    "email_verified": True,
-                }
+                username=username,
+                first_name=f"GuestFirst{i}",
+                last_name=f"GuestLast{i}",
+                role=User.GUEST,
+                email_verified=True,
             )
-            if created:
-                user.set_password("password123")
-                user.save()
-                UserProfile.objects.get_or_create(user=user, defaults={"bio": f"Hi, I am Guest {i}!"})
+            user.set_password("password123")
+            user.save()
+            UserProfile.objects.create(user=user, bio=f"Hi, I am Guest {i}!")
             guests.append(user)
 
         self.stdout.write(f"Seeded {len(guests)} Guest Users.")
-
-        # Delete existing Listings/Images/Reviews/Bookings to have a clean count
-        Image.objects.all().delete()
-        Review.objects.all().delete()
-        Booking.objects.all().delete()
-        Listing.objects.all().delete()
 
         # 2. Create 25 Listings
         listings = []
