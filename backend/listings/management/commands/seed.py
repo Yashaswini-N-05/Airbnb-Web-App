@@ -253,13 +253,15 @@ class Command(BaseCommand):
 
         self.stdout.write("Seeded 10 Reviews.")
 
-        # 5. Create 15 Bookings
+        # 5. Create 15 Bookings (at least 3 must belong to main_guest so Trips page works)
         booking_count = 0
         attempts = 0
+        main_guest_bookings = 0
         while booking_count < 15 and attempts < 100:
             attempts += 1
             listing = random.choice(listings)
-            guest = random.choice(guests)
+            # Force main_guest for the first 3 bookings
+            guest = main_guest if main_guest_bookings < 3 else random.choice(guests)
             
             # Generate random start and end dates
             start_offset = random.randint(1, 90)
@@ -303,6 +305,8 @@ class Command(BaseCommand):
                 )
                 
                 booking_count += 1
+                if guest == main_guest:
+                    main_guest_bookings += 1
 
         self.stdout.write(f"Seeded {booking_count} Bookings (took {attempts} attempts).")
         self.stdout.write("Database seeding completed successfully!")
