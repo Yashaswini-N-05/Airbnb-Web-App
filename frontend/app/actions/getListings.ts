@@ -24,8 +24,26 @@ export default async function getListings(params: IListingsParams) {
     }
     if (category) {
       const catLower = category.toLowerCase();
-      if (['apartment', 'house', 'villa', 'cabin', 'condo', 'cottage', 'studio', 'loft', 'townhouse', 'boat', 'treehouse'].includes(catLower)) {
-        queryParams.property_type = catLower;
+      const CATEGORY_MAP: Record<string, string> = {
+        beach: 'house',
+        windmills: 'cabin',
+        modern: 'apartment',
+        countryside: 'cottage',
+        pools: 'villa',
+        islands: 'villa',
+        lake: 'cabin',
+        skiing: 'cabin',
+        castles: 'townhouse',
+        camping: 'treehouse',
+        arctic: 'cabin',
+        cave: 'treehouse',
+        desert: 'house',
+        barns: 'cottage',
+        lux: 'villa',
+      };
+      const mappedType = CATEGORY_MAP[catLower] || catLower;
+      if (['apartment', 'house', 'villa', 'cabin', 'condo', 'cottage', 'studio', 'loft', 'townhouse', 'boat', 'treehouse'].includes(mappedType)) {
+        queryParams.property_type = mappedType;
       }
     }
     if (locationValue) {
