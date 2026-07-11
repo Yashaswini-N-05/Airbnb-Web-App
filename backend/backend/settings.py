@@ -247,6 +247,10 @@ LOGOUT_URL = "/api/auth/logout/"
 
 # OpenTelemetry tracing — optional, only when OTLP collector is available
 try:
+    otlp_endpoint = config("OTLP_ENDPOINT", default="")
+    if not otlp_endpoint:
+        raise ValueError("OTLP_ENDPOINT not set")
+
     from opentelemetry.trace import get_current_span
     from opentelemetry import trace
     from opentelemetry.sdk.resources import SERVICE_NAME, Resource
@@ -257,7 +261,7 @@ try:
     resource = Resource(attributes={SERVICE_NAME: "airbnb-clone-backend"})
     provider = TracerProvider(resource=resource)
     trace.set_tracer_provider(provider)
-    otlp_exporter = OTLPSpanExporter(endpoint="http://localhost:4318/v1/traces")
+    otlp_exporter = OTLPSpanExporter(endpoint=otlp_endpoint)
     span_processor = BatchSpanProcessor(otlp_exporter)
     provider.add_span_processor(span_processor)
 
