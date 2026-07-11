@@ -15,7 +15,7 @@ export const DELETE = async (request: Request, { params }: { params: IPararms })
     }
 
     const headers = { 'X-User-Id': '7bb66c05-0953-45ea-a835-41e39a9c61f8' };
-    const response = await axios.delete(`${BACKEND_URL}/api/bookings/${reservationId}/`, {
+    const response = await axios.post(`${BACKEND_URL}/api/bookings/${reservationId}/cancel/`, {}, {
       headers
     });
 
