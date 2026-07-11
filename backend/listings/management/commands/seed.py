@@ -72,11 +72,60 @@ class Command(BaseCommand):
     help = "Seeds the database with Airbnb-clone sample data: 5 hosts, 25 listings, 50 images, 10 reviews, and 15 bookings."
 
     def handle(self, *args, **options):
+        import uuid
+        from users.models import UserProfile
         self.stdout.write("Starting database seeding...")
 
-        # 1. Create 5 Host Users
-        hosts = []
-        for i in range(1, 6):
+        # Fixed UUIDs matching frontend config/currentUser.ts and page hardcodes
+        MAIN_HOST_ID   = uuid.UUID("b210662e-633f-4666-bfb6-9d827ab696fb")
+        MAIN_GUEST_ID  = uuid.UUID("7bb66c05-0953-45ea-a835-41e39a9c61f8")
+
+        # 1. Create primary Host (fixed UUID so frontend hardcodes always match)
+        main_host, created = User.objects.get_or_create(
+            email="host1@example.com",
+            defaults={
+                "id": MAIN_HOST_ID,
+                "username": "host_1",
+                "first_name": "Jane",
+                "last_name": "Smith",
+                "role": User.HOST,
+                "is_verified_host": True,
+                "host_approval_status": "approved",
+                "email_verified": True,
+            }
+        )
+        if created:
+            main_host.set_password("password123")
+            main_host.save()
+            UserProfile.objects.get_or_create(main_host, defaults={"bio": "Superhost with 5 years experience!"})
+        # Ensure the UUID is always correct even if user existed with different id
+        if str(main_host.id) != str(MAIN_HOST_ID):
+            User.objects.filter(pk=main_host.pk).update(id=MAIN_HOST_ID)
+            main_host.refresh_from_db()
+
+        # 2. Create primary Guest (fixed UUID so AutoUserAuthentication always finds them)
+        main_guest, created = User.objects.get_or_create(
+            email="guest1@example.com",
+            defaults={
+                "id": MAIN_GUEST_ID,
+                "username": "guest_1",
+                "first_name": "Alex",
+                "last_name": "Johnson",
+                "role": User.GUEST,
+                "email_verified": True,
+            }
+        )
+        if created:
+            main_guest.set_password("password123")
+            main_guest.save()
+            UserProfile.objects.get_or_create(main_guest, defaults={"bio": "Love travelling!"})
+        if str(main_guest.id) != str(MAIN_GUEST_ID):
+            User.objects.filter(pk=main_guest.pk).update(id=MAIN_GUEST_ID)
+            main_guest.refresh_from_db()
+
+        # 3. Create 4 more Host Users
+        hosts = [main_host]
+        for i in range(2, 6):
             email = f"host{i}@example.com"
             username = f"host_{i}"
             user, created = User.objects.get_or_create(
@@ -94,16 +143,14 @@ class Command(BaseCommand):
             if created:
                 user.set_password("password123")
                 user.save()
-                # Create Profile
-                from users.models import UserProfile
                 UserProfile.objects.get_or_create(user=user, defaults={"bio": f"Hi, I am Host {i}!"})
             hosts.append(user)
 
         self.stdout.write(f"Seeded {len(hosts)} Host Users.")
 
-        # Create 5 Guest Users (so we can associate bookings/reviews)
-        guests = []
-        for i in range(1, 6):
+        # 4. Create 4 more Guest Users
+        guests = [main_guest]
+        for i in range(2, 6):
             email = f"guest{i}@example.com"
             username = f"guest_{i}"
             user, created = User.objects.get_or_create(
@@ -119,7 +166,6 @@ class Command(BaseCommand):
             if created:
                 user.set_password("password123")
                 user.save()
-                from users.models import UserProfile
                 UserProfile.objects.get_or_create(user=user, defaults={"bio": f"Hi, I am Guest {i}!"})
             guests.append(user)
 
